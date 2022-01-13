@@ -1,0 +1,25 @@
+{
+  "name": "sample-oauth2-app",
+  "version": "1.0.0",
+  "description": "This is a demo app showcasing the iLert developer platform",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "DEBUG=oauth2sample:* node ./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iLert/sample-oauth2-app.git"
+  },
+  "author": "Chris Froehlingsdorf <chris@ilert.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/iLert/sample-oauth2-app/issues"
+  },
+  "homepage": "https://github.com/iLert/sample-oauth2-app#readme",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "debug": "^4.3.3",
+    "express": "^4.17.2"
+  }
+}
