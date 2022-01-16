@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Sample OAuth2 Webapp</title>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    </head>
+    <body>
+        <div>
+            <h3>Open your browser's Javascript console.</h3>
+        </div>
+        <script>
+            function dec2hex(dec) {
+                return ("0" + dec.toString(16)).substr(-2);
+            }
+
+            function generateCodeVerifier() {
+                const array = new Uint32Array(56 / 2);
+                window.crypto.getRandomValues(array);
+                return Array.from(array, dec2hex).join("");
+            }
+
+            function sha256(plain) {
+                // returns promise ArrayBuffer
+                const encoder = new TextEncoder();
+                const data = encoder.encode(plain);
+                return window.crypto.subtle.digest("SHA-256", data);
+            }
+
+            function base64urlencode(a) {
+
+                let str = "";
+                const bytes = new Uint8Array(a);
+                const len = bytes.byteLength;
+                for (var i = 0; i < len; i++) {
+                    str += String.fromCharCode(bytes[i]);
+                }
+
+                return btoa(str)
+                    .replace(/\+/g, "-")
+                    .replace(/\//g, "_")
+                    .replace(/=+$/, "");
+            }
+
+            async function generateCodeChallengeFromVerifier(v) {
+                const hashed = await sha256(v);
+                const base64encoded = base64urlencode(hashed);
+                return base64encoded;
+            }
+
+            const ilertHost = "http://localhost:8080";
+            const appHost = "http://localhost:4597";
+            const clientId = "123";
+            const scope = "user";
+
+            (async function() {
+
+                let verifier = sessionStorage.getItem("verifier");
+                if(verifier) {
+                    sessionStorage.removeItem("verifier");
+                    console.log("verifier", verifier);
+
+                    const urlSearchParams = new URLSearchParams(window.location.search);
+                    const params = Object.fromEntries(urlSearchParams.entries());
+                    const code = params.code;
+                    console.log("code", code);
+
+                    // STEP 2: fetch access token for code
+
+                    const tokenParams = new URLSearchParams()
+                    tokenParams.append("client_id", clientId);
+                    tokenParams.append("grant_type", "authorization_code");
+                    tokenParams.append("code", code);
+                    tokenParams.append("code_verifier", verifier);
+
+                    const tokenUrl = ilertHost + "/api/developers/oauth2/token";
+                    const tokenResult = await axios.post(tokenUrl, tokenParams, {
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            "Accept": "application/json"
+                        }
+                    });
+
+                    console.log(tokenResult.data);
+
+                    // STEP 3: access api
+
+                    const userUrl = ilertHost + "/api/users/current";
+                    const userResult = await axios.get(userUrl, {
+                        headers: {
+                            "Accept": "application/json",
+                            "Authorization": "Bearer " + tokenResult.data.access_token
+                        }
+                    });
+
+                    console.log(userResult.data);
+                    return;
+                }
+
+                // STEP 1: create authorization request with code challenge
+
+                verifier = generateCodeVerifier();
+                const challenge = await generateCodeChallengeFromVerifier(verifier);
+                sessionStorage.setItem("verifier", verifier);
+
+                window.location = ilertHost + "/api/developers/oauth2/authorize"
+                    + "?client_id=" + clientId
+                    + "&code_challenge_method=S256"
+                    + "&response_type=code"
+                    + "&scope=" + scope
+                    + "&code_challenge=" + challenge
+                    + "&redirect_uri=" + encodeURIComponent(appHost + "/webapp");
+            })();
+        </script>
+    </body>
+</html>
