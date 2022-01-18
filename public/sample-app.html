@@ -8,6 +8,11 @@
         <div>
             <h3>Open your browser's Javascript console.</h3>
         </div>
+        <div>
+            <input type="button" onclick="refreshToken()" value="Refresh token" />
+            <input type="button" onclick="revokeToken()" value="Revoke token" />
+            <input type="button" onclick="fetchUser()" value="Fetch data" />
+        </div>
         <script>
             function dec2hex(dec) {
                 return ("0" + dec.toString(16)).substr(-2);
@@ -65,7 +70,7 @@
 
                     // STEP 2: fetch access token for code
 
-                    const tokenParams = new URLSearchParams()
+                    const tokenParams = new URLSearchParams();
                     tokenParams.append("client_id", clientId);
                     tokenParams.append("grant_type", "authorization_code");
                     tokenParams.append("code", code);
@@ -79,19 +84,60 @@
                         }
                     });
 
-                    console.log(tokenResult.data);
+                    console.log("for code", tokenResult.data);
 
                     // STEP 3: access api
+                    let accessToken = tokenResult.data.access_token;
+                    let refreshToken = tokenResult.data.refresh_token;
 
-                    const userUrl = ilertHost + "/api/users/current";
-                    const userResult = await axios.get(userUrl, {
-                        headers: {
-                            "Accept": "application/json",
-                            "Authorization": "Bearer " + tokenResult.data.access_token
-                        }
-                    });
+                    // refresh access_token for demonstrative purposes (you should do this shortly before your access_token expires, see expires_at in token response)
 
-                    console.log(userResult.data);
+                    window.refreshToken = async function() {
+
+                        const refreshParams = new URLSearchParams();
+                        refreshParams.append("grant_type", "refresh_token");
+                        refreshParams.append("refresh_token", tokenResult.data.refresh_token);
+
+                        const refreshResult = await axios.post(tokenUrl, refreshParams, {
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded",
+                                "Accept": "application/json"
+                            }
+                        });
+
+                        console.log("for refresh_token", refreshResult.data);
+                        accessToken = refreshResult.data.access_token;
+                    };
+
+                    window.revokeToken = async function() {
+
+                        const revokeParams = new URLSearchParams();
+                        revokeParams.append("token", tokenResult.data.refresh_token);
+
+                        const revokeUrl = ilertHost + "/api/developers/oauth2/revoke";
+                        const revokeResult = await axios.post(revokeUrl, revokeParams, {
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded",
+                                "Accept": "application/json"
+                            }
+                        });
+
+                        console.log("for revoke_token", revokeResult);
+                    };
+
+                    window.fetchUser = async function() {
+
+                        const userUrl = ilertHost + "/api/users/current";
+                        const userResult = await axios.get(userUrl, {
+                            headers: {
+                                "Accept": "application/json",
+                                "Authorization": "Bearer " + accessToken
+                            }
+                        });
+
+                        console.log("user fetch with access_token", userResult.data);
+                    };
+
                     return;
                 }
 
