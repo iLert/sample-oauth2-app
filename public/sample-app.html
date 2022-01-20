@@ -12,6 +12,8 @@
             <input type="button" onclick="refreshToken()" value="Refresh token" />
             <input type="button" onclick="revokeToken()" value="Revoke token" />
             <input type="button" onclick="fetchUser()" value="Fetch data" />
+            <input type="button" onclick="badScope()" value="Bad scope" />
+            <input type="button" onclick="badOp()" value="Bad op" />
         </div>
         <script>
             function dec2hex(dec) {
@@ -54,7 +56,7 @@
             const ilertHost = "http://localhost:8080";
             const appHost = "http://localhost:4597";
             const clientId = "123";
-            const scope = "user";
+            const scope = "profile source:w policy:d service:r";
 
             (async function() {
 
@@ -95,6 +97,7 @@
                     window.refreshToken = async function() {
 
                         const refreshParams = new URLSearchParams();
+                        refreshParams.append("client_id", clientId);
                         refreshParams.append("grant_type", "refresh_token");
                         refreshParams.append("refresh_token", tokenResult.data.refresh_token);
 
@@ -136,6 +139,32 @@
                         });
 
                         console.log("user fetch with access_token", userResult.data);
+                    };
+
+                    window.badScope = async function() {
+
+                        const reqUrl = ilertHost + "/api/status-pages";
+                        const res = await axios.get(reqUrl, {
+                            headers: {
+                                "Accept": "application/json",
+                                "Authorization": "Bearer " + accessToken
+                            }
+                        });
+
+                        console.log("bad scope fetch with access_token", res.status);
+                    };
+
+                    window.badOp = async function() {
+
+                        const reqUrl = ilertHost + "/api/alert-sources/123";
+                        const res = await axios.delete(reqUrl, {
+                            headers: {
+                                "Accept": "application/json",
+                                "Authorization": "Bearer " + accessToken
+                            }
+                        });
+
+                        console.log("bad operation fetch with access_token", res.status);
                     };
 
                     return;
