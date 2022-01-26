@@ -3,6 +3,8 @@
 This repository showcases 3 potential ways to implement an OAuth2 authentication flow
 with the iLert OAuth 2.0 Authorization Server.
 
+Visit [the iLert docs](https://docs.ilert.com/rest-api/developing-ilert-apps) to learn more.
+
 ## Running the Sample App
 
 - requires Node.js > v14
@@ -11,6 +13,7 @@ with the iLert OAuth 2.0 Authorization Server.
 - visit your browser under `http://localhost:4597`
 - choose your flow (opening the path will start it)
 - an iLert user account is needed to authorize
+- (update `/config/default.js` with your apps credentials if needed)
 
 ## Authorization Flows
 
