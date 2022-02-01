@@ -5,7 +5,7 @@ const config = {
         clientId: "YOUR-CLIENT-ID",
         clientSecret: "YOUR-SECRET",
         redirectUri: "http://localhost:4597/authorize-result",
-        scope: "user",
+        scope: "profile",
         authorizeUrl: "/api/developers/oauth2/authorize?client_id={clientId}&response_type=code&redirect_uri={redirectUri}&state={state}&scope={scope}",
         tokenUrl: "/api/developers/oauth2/token"
     }
