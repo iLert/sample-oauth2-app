@@ -2,7 +2,7 @@ const config = {
     port: 4597,
     ilert: {
         host: "https://app.ilert.com",
-        clientId: "sample",
+        clientId: "YOUR-CLIENT-ID",
         clientSecret: "YOUR-SECRET",
         redirectUri: "http://localhost:4597/authorize-result",
         scope: "user",
