@@ -1,6 +1,6 @@
 # iLert Sample OAuth2 App
 
-This repository showcases 3 potential ways to implement an OAuth2 authentication flow
+This repository showcases 3 potential ways to implement an OAuth2 authorization flow
 with the iLert OAuth 2.0 Authorization Server.
 
 Visit [the iLert docs](https://docs.ilert.com/rest-api/developing-ilert-apps) to learn more.
