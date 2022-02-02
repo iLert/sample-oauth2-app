@@ -9,11 +9,13 @@ Visit [the iLert docs](https://docs.ilert.com/rest-api/developing-ilert-apps) to
 
 - requires Node.js > v14
 - `npm install`
+- create an iLert application, set your redirect url to either `http://localhost:4597/authorize-result` or `http://localhost:4597/webapp`
+- update `/config/default.js` with your apps credentials #L5,#L6
+- update `/public/sample-app.html` with your apps client id #L59
 - `npm start`
 - visit your browser under `http://localhost:4597`
 - choose your flow (opening the path will start it)
 - an iLert user account is needed to authorize
-- (update `/config/default.js` with your apps credentials if needed)
 
 ## Authorization Flows
 
